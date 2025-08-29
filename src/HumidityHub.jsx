@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Home, Sun, Wind, BarChart3 } from 'lucide-react';
-import { InvokeLLM } from '@/src/integrations/Core';
+import { InvokeLLM } from '@/src/integrations/WeatherAPICore';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/src/components/ui/card';
 import { Input } from '@/src/components/ui/input';
 import { Label } from '@/src/components/ui/label';
