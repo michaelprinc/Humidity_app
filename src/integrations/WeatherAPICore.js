@@ -170,14 +170,14 @@ async function fetchForecastWeather(lat, lon, days = 3) {
       uv: data.current.uv
     };
     
-    // Process hourly forecast (next 24 hours from today and tomorrow)
+    // Process hourly forecast (24 hours starting from current hour)
     const hourly = [];
     const now = new Date();
     const currentHour = now.getHours();
     
-    // Get remaining hours from today
+    // Include current hour and remaining hours from today  
     if (data.forecast.forecastday[0]) {
-      const todayHours = data.forecast.forecastday[0].hour.slice(currentHour + 1);
+      const todayHours = data.forecast.forecastday[0].hour.slice(currentHour);
       todayHours.forEach(hour => {
         hourly.push({
           time: hour.time,
@@ -189,7 +189,7 @@ async function fetchForecastWeather(lat, lon, days = 3) {
     }
     
     // Get hours from tomorrow to complete 24 hours
-    if (data.forecast.forecastday[1]) {
+    if (data.forecast.forecastday[1] && hourly.length < 24) {
       const tomorrowHours = data.forecast.forecastday[1].hour.slice(0, 24 - hourly.length);
       tomorrowHours.forEach(hour => {
         hourly.push({

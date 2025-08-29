@@ -11,10 +11,12 @@ import ComparisonResult from './components/ComparisonResult';
 import LocationPermission from './components/LocationPermission';
 import VentilationForecast from './components/VentilationForecast';
 import TemperatureForecast from './components/TemperatureForecast';
+import IndoorTemperature from './components/IndoorTemperature';
 
 export default function HumidityHub() {
   const [indoorTemp, setIndoorTemp] = useState(21);
   const [indoorHumidity, setIndoorHumidity] = useState(55);
+  const [indoorTempSource, setIndoorTempSource] = useState('manual'); // Track source of indoor data
   const [location, setLocation] = useState(null);
   const [locationError, setLocationError] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
@@ -25,6 +27,14 @@ export default function HumidityHub() {
   const [forecastData, setForecastData] = useState(null);
   const [isForecastLoading, setIsForecastLoading] = useState(false);
   const [forecastError, setForecastError] = useState(null);
+
+  // Handle indoor temperature updates from the IndoorTemperature component
+  const handleIndoorTemperatureChange = useCallback((tempData) => {
+    console.log('🏠 Indoor temperature updated:', tempData);
+    setIndoorTemp(tempData.temperature);
+    setIndoorHumidity(tempData.humidity || 55); // Default humidity if not provided
+    setIndoorTempSource(tempData.source);
+  }, []);
 
   // Dew Point Calculation
   const calculateDewPoint = (T, RH) => {
@@ -86,37 +96,69 @@ export default function HumidityHub() {
       const fetchWeather = async () => {
         setIsLoadingWeather(true);
         try {
-          console.log('🌤️ Fetching current weather for:', location);
+          console.log('🌤️ Fetching current weather from forecast data for:', location);
           
-          // Use more specific prompt to request current weather data
-          const prompt = `Get current weather data for latitude ${location.latitude} and longitude ${location.longitude}. Return current conditions only.`;
+          // Use the same forecast data source to ensure consistency
+          const prompt = `Get 24-hour hourly weather forecast for latitude ${location.latitude} and longitude ${location.longitude}. Include current conditions and temperature and humidity for each hour.`;
           const result = await InvokeLLM({
             prompt,
             add_context_from_internet: true,
             response_json_schema: {
               type: "object",
               properties: {
-                temperature: { type: "number", description: "Temperature in Celsius" },
-                humidity: { type: "number", description: "Relative humidity in percent" },
-                condition: { type: "string", description: "Weather condition" },
-                wind_kph: { type: "number", description: "Wind speed in km/h" },
-                pressure_mb: { type: "number", description: "Pressure in mb" },
-                uv: { type: "number", description: "UV index" }
+                current: {
+                  type: "object",
+                  properties: {
+                    temperature: { type: "number", description: "Temperature in Celsius" },
+                    humidity: { type: "number", description: "Relative humidity in percent" },
+                    condition: { type: "string", description: "Weather condition" },
+                    wind_kph: { type: "number", description: "Wind speed in km/h" },
+                    pressure_mb: { type: "number", description: "Pressure in mb" },
+                    uv: { type: "number", description: "UV index" }
+                  },
+                  required: ["temperature", "humidity"]
+                },
+                hourly: {
+                  type: "array",
+                  items: {
+                    type: "object",
+                    properties: {
+                      time: { type: "string", description: "ISO datetime string" },
+                      temperature: { type: "number", description: "Temperature in Celsius" },
+                      humidity: { type: "number", description: "Relative humidity in percent" },
+                      condition: { type: "string", description: "Weather condition" }
+                    },
+                    required: ["time", "temperature", "humidity"]
+                  }
+                }
               },
-              required: ["temperature", "humidity"],
+              required: ["current"]
             },
           });
           
-          console.log('🌤️ Current weather result:', result);
+          console.log('🌤️ Forecast weather result for current analysis:', result);
           console.log('🌤️ Type of result:', typeof result, Array.isArray(result));
           
-          // Handle both direct object and nested object responses
-          let weatherData = result;
+          // Extract current weather from forecast data to ensure consistency
+          let weatherData = null;
           if (result && result.current) {
             weatherData = result.current;
+            console.log('🌤️ Using current weather from forecast endpoint');
+          } else if (result && result.hourly && result.hourly.length > 0) {
+            // Fallback: use first hour of forecast as current
+            const firstHour = result.hourly[0];
+            weatherData = {
+              temperature: firstHour.temperature,
+              humidity: firstHour.humidity,
+              condition: firstHour.condition || 'Partly cloudy',
+              wind_kph: 0, // Default values for missing data
+              pressure_mb: 1013,
+              uv: 0
+            };
+            console.log('🌤️ Using first forecast hour as current weather');
           }
           
-          console.log('🌤️ Processed weather data:', weatherData);
+          console.log('🌤️ Processed current weather data:', weatherData);
           setWeatherData(weatherData);
         } catch (error) {
           console.error("❌ Failed to fetch weather data:", error);
@@ -130,6 +172,7 @@ export default function HumidityHub() {
   }, [location]);
 
   // Shared forecast data fetcher for both forecast tabs
+  // Note: Current Analysis tab also uses forecast endpoint for data consistency
   const fetchForecastData = useCallback(async () => {
     if (!location) return;
     
@@ -228,37 +271,7 @@ export default function HumidityHub() {
 
       {activeTab === 'current' && (
         <>
-          <Card className="bg-white/80 backdrop-blur-sm border-slate-200/60 shadow-subtle rounded-2xl">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-slate-700">
-                <Home className="h-5 w-5" />
-                Your Indoor Climate
-              </CardTitle>
-              <CardDescription>Set your current indoor conditions.</CardDescription>
-            </CardHeader>
-            <CardContent className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="indoor-temp">Temperature (°C)</Label>
-                <Input
-                  id="indoor-temp"
-                  type="number"
-                  value={indoorTemp}
-                  onChange={(e) => setIndoorTemp(parseFloat(e.target.value) || 0)}
-                  className="font-medium"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="indoor-humidity">Humidity (%)</Label>
-                <Input
-                  id="indoor-humidity"
-                  type="number"
-                  value={indoorHumidity}
-                  onChange={(e) => setIndoorHumidity(parseFloat(e.target.value) || 0)}
-                  className="font-medium"
-                />
-              </div>
-            </CardContent>
-          </Card>
+          <IndoorTemperature onTemperatureChange={handleIndoorTemperatureChange} />
           
           <div className="grid grid-cols-1 gap-6">
             <ClimateDisplayCard title="Indoor Climate" icon={<Home className="h-5 w-5 text-slate-600" />} data={indoorData} isLoading={false} />
@@ -281,6 +294,9 @@ export default function HumidityHub() {
               <CardTitle className="flex items-center gap-2 text-lg font-semibold text-slate-700">
                 <Home className="h-5 w-5" />
                 Indoor Reference
+                <span className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full ml-auto">
+                  {indoorTempSource === 'google_nest' ? 'Google Nest' : 'Manual Entry'}
+                </span>
               </CardTitle>
               <CardDescription>Current indoor conditions for ventilation analysis.</CardDescription>
             </CardHeader>
@@ -322,6 +338,9 @@ export default function HumidityHub() {
               <CardTitle className="flex items-center gap-2 text-lg font-semibold text-slate-700">
                 <Home className="h-5 w-5" />
                 Indoor Reference
+                <span className="text-xs bg-slate-100 text-slate-600 px-2 py-1 rounded-full ml-auto">
+                  {indoorTempSource === 'google_nest' ? 'Google Nest' : 'Manual Entry'}
+                </span>
               </CardTitle>
               <CardDescription>Current indoor conditions for comparison with outdoor forecast.</CardDescription>
             </CardHeader>
