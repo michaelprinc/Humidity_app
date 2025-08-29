@@ -7,11 +7,11 @@
 
 class WeatherAPIConfig {
   constructor() {
-    this.apiKey = process.env.REACT_APP_WEATHERAPI_KEY;
-    this.baseUrl = process.env.REACT_APP_WEATHERAPI_BASE_URL || 'https://api.weatherapi.com/v1';
-    this.cacheDuration = parseInt(process.env.REACT_APP_WEATHER_CACHE_DURATION || '15') * 60 * 1000; // Convert to ms
-    this.debugMode = process.env.REACT_APP_WEATHER_DEBUG === 'true';
-    this.fallbackToMock = process.env.REACT_APP_WEATHER_FALLBACK_MOCK === 'true';
+    this.apiKey = import.meta.env.VITE_WEATHERAPI_KEY || import.meta.env.REACT_APP_WEATHERAPI_KEY;
+    this.baseUrl = import.meta.env.VITE_WEATHERAPI_BASE_URL || import.meta.env.REACT_APP_WEATHERAPI_BASE_URL || 'https://api.weatherapi.com/v1';
+    this.cacheDuration = parseInt(import.meta.env.VITE_WEATHER_CACHE_DURATION || import.meta.env.REACT_APP_WEATHER_CACHE_DURATION || '15') * 60 * 1000; // Convert to ms
+    this.debugMode = (import.meta.env.VITE_WEATHER_DEBUG || import.meta.env.REACT_APP_WEATHER_DEBUG) === 'true';
+    this.fallbackToMock = (import.meta.env.VITE_WEATHER_FALLBACK_MOCK || import.meta.env.REACT_APP_WEATHER_FALLBACK_MOCK) === 'true';
     
     if (!this.apiKey) {
       console.warn('⚠️  WeatherAPI key not found. Run: node setup-weather-config.js');
