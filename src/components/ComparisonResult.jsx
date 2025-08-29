@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { AlertCircle, CheckCircle, Wind } from 'lucide-react';
-import { Alert, AlertTitle, AlertDescription } from '@/src/components/ui/alert';
+import { Alert, AlertTitle, AlertDescription } from './ui/alert';
 
 export default function ComparisonResult({ indoorDewPoint, outdoorDewPoint }) {
   if (indoorDewPoint === null || outdoorDewPoint === null) {

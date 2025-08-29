@@ -1,7 +1,7 @@
 import React from 'react';
 import { MapPin, Shield } from 'lucide-react';
-import { Button } from '@/src/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/src/components/ui/card';
+import { Button } from './ui/button';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './ui/card';
 
 export default function LocationPermission({ onAllow }) {
   return (

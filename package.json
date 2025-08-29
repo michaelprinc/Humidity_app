@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "setup-weather": "node setup-weather-config.js",
     "setup-weather-ps": "powershell -ExecutionPolicy Bypass -File setup-weather-config.ps1",
-    "test-weather": "node test-weather-config.js"
+    "test-weather": "node test-weather-config.js",
+    "migrate-weather": "node migrate-to-weatherapi.js"
   },
   "dependencies": {
     "react": "^18.2.0",

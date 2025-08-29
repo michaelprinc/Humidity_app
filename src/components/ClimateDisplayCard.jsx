@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Thermometer, Droplets, CloudDrizzle } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/src/components/ui/card';
-import { Skeleton } from '@/src/components/ui/skeleton';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
+import { Skeleton } from './ui/skeleton';
 
 const Stat = ({ icon, value, label, unit }) => (
   <div className="flex items-center space-x-3">

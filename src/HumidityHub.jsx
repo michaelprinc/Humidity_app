@@ -1,15 +1,16 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { Home, Sun, Wind, BarChart3 } from 'lucide-react';
-import { InvokeLLM } from '@/src/integrations/WeatherAPICore';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/src/components/ui/card';
-import { Input } from '@/src/components/ui/input';
-import { Label } from '@/src/components/ui/label';
-import { Button } from '@/src/components/ui/button';
+import { Home, Sun, Wind, BarChart3, Thermometer } from 'lucide-react';
+import { InvokeLLM } from './integrations/WeatherAPICore';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from './components/ui/card';
+import { Input } from './components/ui/input';
+import { Label } from './components/ui/label';
+import { Button } from './components/ui/button';
 
 import ClimateDisplayCard from './components/ClimateDisplayCard';
 import ComparisonResult from './components/ComparisonResult';
 import LocationPermission from './components/LocationPermission';
 import VentilationForecast from './components/VentilationForecast';
+import TemperatureForecast from './components/TemperatureForecast';
 
 export default function HumidityHub() {
   const [indoorTemp, setIndoorTemp] = useState(21);
@@ -18,7 +19,12 @@ export default function HumidityHub() {
   const [locationError, setLocationError] = useState(null);
   const [weatherData, setWeatherData] = useState(null);
   const [isLoadingWeather, setIsLoadingWeather] = useState(true);
-  const [activeTab, setActiveTab] = useState('current'); // 'current' or 'forecast'
+  const [activeTab, setActiveTab] = useState('current'); // 'current', 'forecast', or 'temperature'
+  
+  // Shared forecast data for both forecast tabs
+  const [forecastData, setForecastData] = useState(null);
+  const [isForecastLoading, setIsForecastLoading] = useState(false);
+  const [forecastError, setForecastError] = useState(null);
 
   // Dew Point Calculation
   const calculateDewPoint = (T, RH) => {
@@ -32,6 +38,10 @@ export default function HumidityHub() {
   const indoorDewPoint = calculateDewPoint(indoorTemp, indoorHumidity);
   const outdoorDewPoint = weatherData ? calculateDewPoint(weatherData.temperature, weatherData.humidity) : null;
   
+  // Debug outdoor weather data
+  console.log('🎯 Weather data state:', weatherData);
+  console.log('🎯 Outdoor dew point:', outdoorDewPoint);
+  
   const indoorData = {
     temperature: indoorTemp,
     humidity: indoorHumidity,
@@ -43,6 +53,8 @@ export default function HumidityHub() {
     humidity: weatherData.humidity,
     dewPoint: outdoorDewPoint,
   } : null;
+  
+  console.log('🎯 Outdoor data object:', outdoorData);
 
   const requestLocation = useCallback(() => {
     setLocationError(null);
@@ -74,7 +86,10 @@ export default function HumidityHub() {
       const fetchWeather = async () => {
         setIsLoadingWeather(true);
         try {
-          const prompt = `Get the current weather for latitude ${location.latitude} and longitude ${location.longitude}.`;
+          console.log('🌤️ Fetching current weather for:', location);
+          
+          // Use more specific prompt to request current weather data
+          const prompt = `Get current weather data for latitude ${location.latitude} and longitude ${location.longitude}. Return current conditions only.`;
           const result = await InvokeLLM({
             prompt,
             add_context_from_internet: true,
@@ -83,13 +98,28 @@ export default function HumidityHub() {
               properties: {
                 temperature: { type: "number", description: "Temperature in Celsius" },
                 humidity: { type: "number", description: "Relative humidity in percent" },
+                condition: { type: "string", description: "Weather condition" },
+                wind_kph: { type: "number", description: "Wind speed in km/h" },
+                pressure_mb: { type: "number", description: "Pressure in mb" },
+                uv: { type: "number", description: "UV index" }
               },
               required: ["temperature", "humidity"],
             },
           });
-          setWeatherData(result);
+          
+          console.log('🌤️ Current weather result:', result);
+          console.log('🌤️ Type of result:', typeof result, Array.isArray(result));
+          
+          // Handle both direct object and nested object responses
+          let weatherData = result;
+          if (result && result.current) {
+            weatherData = result.current;
+          }
+          
+          console.log('🌤️ Processed weather data:', weatherData);
+          setWeatherData(weatherData);
         } catch (error) {
-          console.error("Failed to fetch weather data:", error);
+          console.error("❌ Failed to fetch weather data:", error);
           setWeatherData(null);
         } finally {
           setIsLoadingWeather(false);
@@ -98,6 +128,63 @@ export default function HumidityHub() {
       fetchWeather();
     }
   }, [location]);
+
+  // Shared forecast data fetcher for both forecast tabs
+  const fetchForecastData = useCallback(async () => {
+    if (!location) return;
+    
+    setIsForecastLoading(true);
+    setForecastError(null);
+    
+    try {
+      const prompt = `Get 24-hour hourly weather forecast for latitude ${location.latitude} and longitude ${location.longitude}. Include temperature and humidity for each hour.`;
+      const result = await InvokeLLM({
+        prompt,
+        add_context_from_internet: true,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            current: {
+              type: "object",
+              properties: {
+                temperature: { type: "number" },
+                humidity: { type: "number" },
+                condition: { type: "string" }
+              }
+            },
+            hourly: {
+              type: "array",
+              items: {
+                type: "object",
+                properties: {
+                  time: { type: "string", description: "ISO datetime string" },
+                  temperature: { type: "number", description: "Temperature in Celsius" },
+                  humidity: { type: "number", description: "Relative humidity in percent" },
+                  condition: { type: "string", description: "Weather condition" }
+                },
+                required: ["time", "temperature", "humidity"]
+              }
+            }
+          },
+          required: ["hourly"]
+        }
+      });
+      
+      setForecastData(result);
+    } catch (err) {
+      setForecastError("Failed to fetch forecast data");
+      console.error("Forecast error:", err);
+    } finally {
+      setIsForecastLoading(false);
+    }
+  }, [location]);
+
+  // Auto-fetch forecast data when location changes and we're on a forecast tab
+  useEffect(() => {
+    if (location && (activeTab === 'forecast' || activeTab === 'temperature')) {
+      fetchForecastData();
+    }
+  }, [location, activeTab, fetchForecastData]);
 
   return (
     <div className="space-y-6">
@@ -126,6 +213,15 @@ export default function HumidityHub() {
           >
             <Wind className="h-4 w-4" />
             Ventilation Forecast
+          </Button>
+          <Button
+            variant={activeTab === 'temperature' ? 'default' : 'ghost'}
+            size="sm"
+            onClick={() => setActiveTab('temperature')}
+            className="flex items-center gap-2"
+          >
+            <Thermometer className="h-4 w-4" />
+            24-Hour Forecast
           </Button>
         </div>
       </div>
@@ -207,7 +303,54 @@ export default function HumidityHub() {
           {locationError ? (
             <LocationPermission onAllow={requestLocation} />
           ) : (
-            <VentilationForecast location={location} indoorDewPoint={indoorDewPoint} />
+            <VentilationForecast 
+              location={location} 
+              indoorDewPoint={indoorDewPoint}
+              forecastData={forecastData}
+              isLoading={isForecastLoading}
+              error={forecastError}
+              onRefresh={fetchForecastData}
+            />
+          )}
+        </>
+      )}
+
+      {activeTab === 'temperature' && (
+        <>
+          <Card className="bg-white/80 backdrop-blur-sm border-slate-200/60 shadow-subtle rounded-2xl">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-slate-700">
+                <Home className="h-5 w-5" />
+                Indoor Reference
+              </CardTitle>
+              <CardDescription>Current indoor conditions for comparison with outdoor forecast.</CardDescription>
+            </CardHeader>
+            <CardContent className="grid grid-cols-3 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-slate-700">{indoorTemp}°C</div>
+                <div className="text-sm text-slate-500">Temperature</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-slate-700">{indoorHumidity}%</div>
+                <div className="text-sm text-slate-500">Humidity</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-slate-700">{indoorDewPoint?.toFixed(1)}°C</div>
+                <div className="text-sm text-slate-500">Dew Point</div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {locationError ? (
+            <LocationPermission onAllow={requestLocation} />
+          ) : (
+            <TemperatureForecast 
+              location={location}
+              forecastData={forecastData}
+              isLoading={isForecastLoading}
+              error={forecastError}
+              onRefresh={fetchForecastData}
+            />
           )}
         </>
       )}
