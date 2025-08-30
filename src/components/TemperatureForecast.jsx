@@ -6,6 +6,20 @@ import { Alert, AlertDescription, AlertTitle } from './ui/alert';
 import { Skeleton } from './ui/skeleton';
 
 export default function TemperatureForecast({ location, forecastData, isLoading, error, onRefresh }) {
+  // Extract location name from forecast data if available
+  const getLocationDisplayName = () => {
+    if (forecastData?.location) {
+      const { name, region, country } = forecastData.location;
+      // Create a precise location string
+      if (region && region !== name) {
+        return `${name}, ${region}, ${country}`;
+      }
+      return `${name}, ${country}`;
+    }
+    return null;
+  };
+
+  const locationDisplayName = getLocationDisplayName();
   // Calculate dew point helper function
   const calculateDewPoint = (T, RH) => {
     if (T === null || RH === null) return null;
@@ -87,7 +101,14 @@ export default function TemperatureForecast({ location, forecastData, isLoading,
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg font-semibold text-slate-700">
             <Thermometer className="h-5 w-5" />
-            24-Hour Temperature & Humidity Forecast
+            <div className="flex flex-col">
+              <span>24-Hour Temperature & Humidity Forecast</span>
+              {locationDisplayName && (
+                <span className="text-sm font-normal text-slate-500 mt-1">
+                  📍 {locationDisplayName}
+                </span>
+              )}
+            </div>
           </CardTitle>
           <CardDescription>Loading detailed hourly predictions...</CardDescription>
         </CardHeader>
@@ -105,7 +126,14 @@ export default function TemperatureForecast({ location, forecastData, isLoading,
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg font-semibold text-slate-700">
             <Thermometer className="h-5 w-5" />
-            24-Hour Temperature & Humidity Forecast
+            <div className="flex flex-col">
+              <span>24-Hour Temperature & Humidity Forecast</span>
+              {locationDisplayName && (
+                <span className="text-sm font-normal text-slate-500 mt-1">
+                  📍 {locationDisplayName}
+                </span>
+              )}
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -129,7 +157,14 @@ export default function TemperatureForecast({ location, forecastData, isLoading,
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-lg font-semibold text-slate-700">
             <Thermometer className="h-5 w-5" />
-            24-Hour Temperature & Humidity Forecast
+            <div className="flex flex-col">
+              <span>24-Hour Temperature & Humidity Forecast</span>
+              {locationDisplayName && (
+                <span className="text-sm font-normal text-slate-500 mt-1">
+                  📍 {locationDisplayName}
+                </span>
+              )}
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -155,7 +190,14 @@ export default function TemperatureForecast({ location, forecastData, isLoading,
           <CardTitle className="flex items-center justify-between text-lg font-semibold text-slate-700">
             <div className="flex items-center gap-2">
               <Thermometer className="h-5 w-5" />
-              24-Hour Temperature & Humidity Forecast
+              <div className="flex flex-col">
+                <span>24-Hour Temperature & Humidity Forecast</span>
+                {locationDisplayName && (
+                  <span className="text-sm font-normal text-slate-500 mt-1">
+                    📍 {locationDisplayName}
+                  </span>
+                )}
+              </div>
             </div>
             <Button
               onClick={onRefresh}
@@ -167,7 +209,10 @@ export default function TemperatureForecast({ location, forecastData, isLoading,
               Refresh Forecast
             </Button>
           </CardTitle>
-          <CardDescription>Detailed hourly predictions with computed dew points</CardDescription>
+          <CardDescription>
+            Detailed hourly predictions with computed dew points
+            {locationDisplayName && ` for ${locationDisplayName}`}
+          </CardDescription>
         </CardHeader>
         
         {stats && (

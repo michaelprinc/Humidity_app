@@ -106,7 +106,19 @@ async function fetchCurrentWeather(lat, lon) {
       throw new Error(`WeatherAPI Error: ${data.error.message}`);
     }
     
+    // Process location information
+    const location = {
+      name: data.location.name,
+      region: data.location.region,
+      country: data.location.country,
+      lat: data.location.lat,
+      lon: data.location.lon,
+      tz_id: data.location.tz_id,
+      localtime: data.location.localtime
+    };
+    
     const weatherData = {
+      location,
       temperature: data.current.temp_c,
       humidity: data.current.humidity,
       condition: data.current.condition.text,
@@ -160,6 +172,17 @@ async function fetchForecastWeather(lat, lon, days = 3) {
       throw new Error(`WeatherAPI Error: ${data.error.message}`);
     }
     
+    // Process location information
+    const location = {
+      name: data.location.name,
+      region: data.location.region,
+      country: data.location.country,
+      lat: data.location.lat,
+      lon: data.location.lon,
+      tz_id: data.location.tz_id,
+      localtime: data.location.localtime
+    };
+    
     // Process current weather
     const current = {
       temperature: data.current.temp_c,
@@ -201,7 +224,7 @@ async function fetchForecastWeather(lat, lon, days = 3) {
       });
     }
     
-    const forecastData = { current, hourly };
+    const forecastData = { location, current, hourly };
     
     // Cache the result
     weatherCache.set(cacheKey, {
