@@ -184,6 +184,28 @@ catch {
     Write-Host "   Gradle optimization failed: $_" -ForegroundColor Red
 }
 
+# Step 7: Create debug keystore
+Write-Host "Creating debug keystore..." -ForegroundColor Blue
+try {
+    $KeystorePath = "android\app\debug.keystore"
+    if (!(Test-Path $KeystorePath)) {
+        $JavaKeytool = "$env:JAVA_HOME\bin\keytool.exe"
+        if (Test-Path $JavaKeytool) {
+            Set-Location "android\app"
+            & $JavaKeytool -genkey -v -keystore debug.keystore -alias androiddebugkey -keyalg RSA -keysize 2048 -validity 10000 -storepass android -keypass android -dname "CN=Android Debug,O=Android,C=US"
+            Set-Location "..\..\"
+            Write-Host "   Debug keystore created" -ForegroundColor Green
+        } else {
+            Write-Host "   Keytool not found - keystore creation skipped" -ForegroundColor Yellow
+        }
+    } else {
+        Write-Host "   Debug keystore already exists" -ForegroundColor Green
+    }
+}
+catch {
+    Write-Host "   Keystore creation failed: $_" -ForegroundColor Red
+}
+
 Write-Host ""
 Write-Host "============================================" -ForegroundColor Green
 Write-Host "CAPACITOR ANDROID FRAMEWORK INITIALIZED!" -ForegroundColor Green  

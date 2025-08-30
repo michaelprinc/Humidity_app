@@ -15,7 +15,8 @@
     "android:init": "powershell -ExecutionPolicy Bypass -File android-framework/scripts/init-capacitor.ps1",
     "android:build": "powershell -ExecutionPolicy Bypass -File build-android.ps1",
     "android:build-release": "powershell -ExecutionPolicy Bypass -File build-android.ps1 -Release",
-    "android:clean": "powershell -ExecutionPolicy Bypass -File android-framework/scripts/clean-android.ps1"
+    "android:clean": "powershell -ExecutionPolicy Bypass -File android-framework/scripts/clean-android.ps1",
+    "android:test-install": "powershell -ExecutionPolicy Bypass -File test-android-install.ps1"
   },
   "dependencies": {
     "class-variance-authority": "^0.7.0",

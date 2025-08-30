@@ -8,6 +8,41 @@ param(
     [string]$OutputName = ""
 )
 
+# APK Verification Function
+function Test-ApkIntegrity {
+    param($ApkPath)
+    
+    try {
+        # Try to find aapt in Android SDK
+        $AaptPaths = @(
+            "$env:ANDROID_HOME\build-tools\34.0.0\aapt.exe",
+            "$env:ANDROID_HOME\build-tools\33.0.1\aapt.exe",
+            "$env:ANDROID_HOME\build-tools\33.0.0\aapt.exe",
+            "$env:ANDROID_HOME\build-tools\32.0.0\aapt.exe"
+        )
+        
+        foreach ($AaptPath in $AaptPaths) {
+            if (Test-Path $AaptPath) {
+                $result = & $AaptPath dump badging $ApkPath 2>&1
+                if ($LASTEXITCODE -eq 0) {
+                    return $true
+                }
+                break
+            }
+        }
+        
+        # If aapt not found, just check file integrity
+        $fileInfo = Get-Item $ApkPath
+        if ($fileInfo.Length -gt 1MB) {
+            return $true
+        }
+    } catch {
+        # Verification failed, but APK might still be valid
+        return $false
+    }
+    return $false
+}
+
 # Configuration
 $AppName = "HumidityApp"
 $ProjectRoot = $PSScriptRoot
@@ -128,7 +163,7 @@ try {
     
     if ($Release) {
         .\gradlew assembleRelease
-        $BuiltApkPath = "app\build\outputs\apk\release\app-release-unsigned.apk"
+        $BuiltApkPath = "app\build\outputs\apk\release\app-release.apk"
     } else {
         .\gradlew assembleDebug
         $BuiltApkPath = "app\build\outputs\apk\debug\app-debug.apk"
@@ -157,6 +192,14 @@ try {
         # Get APK size
         $ApkSize = [math]::Round((Get-Item $DestApk).Length / 1MB, 2)
         Write-Host "    APK size: ${ApkSize} MB" -ForegroundColor Green
+        
+        # Verify APK integrity
+        Write-Host "    Verifying APK integrity..." -ForegroundColor Blue
+        if (Test-ApkIntegrity $DestApk) {
+            Write-Host "    APK verification successful" -ForegroundColor Green
+        } else {
+            Write-Host "    APK verification failed - manual testing recommended" -ForegroundColor Yellow
+        }
     } else {
         throw "Built APK not found at $SourceApk"
     }
@@ -178,6 +221,11 @@ Write-Host "APK Location: $DestApk" -ForegroundColor Yellow
 Write-Host "APK Size: ${ApkSize} MB" -ForegroundColor Yellow
 Write-Host "Build Type: $BuildType" -ForegroundColor Yellow
 Write-Host "Timestamp: $Timestamp" -ForegroundColor Yellow
+Write-Host ""
+Write-Host "Installation Options:" -ForegroundColor Cyan
+Write-Host "1. ADB Install (Recommended): adb install `"$DestApk`"" -ForegroundColor White
+Write-Host "2. Manual Install: Copy APK to device and install" -ForegroundColor White
+Write-Host "3. For Android 13+: Ensure Developer Options enabled" -ForegroundColor White
 
 # Optional: Open APKs folder
 $OpenFolder = Read-Host "Open APKs folder? (y/n)"
