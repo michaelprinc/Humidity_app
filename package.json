@@ -12,6 +12,7 @@
     "setup-weather-ps": "powershell -ExecutionPolicy Bypass -File setup-weather-config.ps1",
     "test-weather": "node test-weather-config.js",
     "migrate-weather": "node migrate-to-weatherapi.js",
+    "test-tuya": "node test-tuya-integration.js",
     "android:init": "powershell -ExecutionPolicy Bypass -File android-framework/scripts/init-capacitor.ps1",
     "android:build": "powershell -ExecutionPolicy Bypass -File build-android.ps1",
     "android:build-release": "powershell -ExecutionPolicy Bypass -File build-android.ps1 -Release",

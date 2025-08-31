@@ -11,6 +11,7 @@
 
 class GoogleAuthConfig {
   constructor() {
+    this.enabled = (import.meta.env.VITE_ENABLE_GOOGLE_OAUTH || process.env.VITE_ENABLE_GOOGLE_OAUTH) === 'true';
     // OAuth 2.0 Configuration
     this.clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || import.meta.env.REACT_APP_GOOGLE_CLIENT_ID;
     this.clientSecret = import.meta.env.VITE_GOOGLE_CLIENT_SECRET || import.meta.env.REACT_APP_GOOGLE_CLIENT_SECRET;
@@ -25,10 +26,10 @@ class GoogleAuthConfig {
     this.debugMode = (import.meta.env.VITE_GOOGLE_HOME_DEBUG || import.meta.env.REACT_APP_GOOGLE_HOME_DEBUG) === 'true';
     
     // Check configuration
-    this.isConfigured = !!(this.clientId && this.projectId);
+    this.isConfigured = this.enabled && !!(this.clientId && this.projectId);
     
     if (!this.isConfigured && this.debugMode) {
-      console.warn('⚠️  Google Home integration not configured. Set VITE_GOOGLE_CLIENT_ID and VITE_GOOGLE_DEVICE_ACCESS_PROJECT_ID in .env file');
+      console.warn('⚠️  Google Home integration disabled or not configured. Set VITE_ENABLE_GOOGLE_OAUTH=true and provide credentials to enable.');
     }
   }
 

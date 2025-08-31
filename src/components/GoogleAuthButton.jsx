@@ -20,6 +20,14 @@ import {
  * for Smart Device Management API access.
  */
 export default function GoogleAuthButton({ onAuthSuccess, onAuthError }) {
+  const isEnabled = (import.meta.env.VITE_ENABLE_GOOGLE_OAUTH || process.env.VITE_ENABLE_GOOGLE_OAUTH) === 'true';
+  if (!isEnabled) {
+    return (
+      <div className="p-4 text-center text-sm text-gray-500">
+        Google OAuth is disabled.
+      </div>
+    );
+  }
   const signInButtonRef = useRef(null);
   const [authState, setAuthState] = useState({
     isConfigured: false,
