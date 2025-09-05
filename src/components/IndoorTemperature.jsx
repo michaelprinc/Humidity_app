@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Thermometer, Home, Settings, Smartphone, AlertCircle, RefreshCw } from 'lucide-react';
+import { Thermometer, Home, Settings, Smartphone, Camera, AlertCircle, RefreshCw } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
 import { Button } from './ui/button';
 import { Input } from './ui/input';
@@ -9,20 +9,22 @@ import { Alert, AlertDescription } from './ui/alert';
 import { Skeleton } from './ui/skeleton';
 import GoogleAuthButton from './GoogleAuthButton';
 import { getCurrentIndoorTemperature, getAuthStatus } from '../integrations/GoogleAuth';
+import OcrInput from './OcrInput';
 
 /**
  * IndoorTemperature Component
  * 
- * Handles indoor temperature data with three sources:
+ * Handles indoor temperature data with multiple sources:
  * 1. Google Home/Nest devices (primary)
  * 2. Manual user input (fallback)
- * 3. No data (prompts user to choose)
+ * 3. OCR camera input for digital displays
+ * 4. No data (prompts user to choose)
  */
 export default function IndoorTemperature({ onTemperatureChange }) {
   const [temperatureData, setTemperatureData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const [dataSource, setDataSource] = useState('none'); // 'google', 'manual', 'none'
+  const [dataSource, setDataSource] = useState('none'); // 'google', 'manual', 'ocr', 'none'
   
   // Google Home state
   const [isGoogleConfigured, setIsGoogleConfigured] = useState(false);
@@ -30,6 +32,10 @@ export default function IndoorTemperature({ onTemperatureChange }) {
   // Manual entry state
   const [manualTemp, setManualTemp] = useState('');
   const [manualHumidity, setManualHumidity] = useState('');
+
+  // OCR entry state
+  const [ocrStage, setOcrStage] = useState('temperature'); // 'temperature' -> 'humidity' -> 'done'
+  const [ocrTemp, setOcrTemp] = useState(null);
   
   // Initialize component
   useEffect(() => {
@@ -153,7 +159,7 @@ export default function IndoorTemperature({ onTemperatureChange }) {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {isGoogleConfigured && (
             <Button
               onClick={() => setDataSource('google')}
@@ -177,6 +183,22 @@ export default function IndoorTemperature({ onTemperatureChange }) {
             <div className="text-center">
               <div className="font-medium">Manual Entry</div>
               <div className="text-xs text-gray-600">Enter temperature manually</div>
+            </div>
+          </Button>
+
+          <Button
+            onClick={() => {
+              setDataSource('ocr');
+              setOcrStage('temperature');
+              setOcrTemp(null);
+            }}
+            className="flex flex-col items-center p-6 h-auto space-y-3 bg-green-50 hover:bg-green-100 text-green-700 border-green-200"
+            variant="outline"
+          >
+            <Camera className="h-8 w-8" />
+            <div className="text-center">
+              <div className="font-medium">Camera OCR</div>
+              <div className="text-xs text-green-600">Scan digital display</div>
             </div>
           </Button>
         </div>
@@ -345,6 +367,60 @@ export default function IndoorTemperature({ onTemperatureChange }) {
     );
   };
 
+  const renderOcrView = () => {
+    if (dataSource !== 'ocr') return null;
+
+    if (ocrStage !== 'done') {
+      const label = ocrStage === 'temperature' ? 'Temperature (°C)' : 'Humidity (%)';
+      const handleValue = (value) => {
+        if (ocrStage === 'temperature') {
+          setOcrTemp(value);
+          setOcrStage('humidity');
+        } else {
+          setTemperatureData({
+            temperature: ocrTemp,
+            humidity: value,
+            source: 'ocr',
+            timestamp: new Date(),
+            lastUpdated: new Date(),
+          });
+          setOcrStage('done');
+        }
+      };
+
+      return (
+        <div className="space-y-4">
+          <div className="flex items-center space-x-2">
+            <Camera className="h-5 w-5 text-green-600" />
+            <span className="font-medium text-slate-700">Scan {label}</span>
+          </div>
+          <OcrInput label={label} onConfirm={handleValue} />
+        </div>
+      );
+    }
+
+    return (
+      <div className="bg-gray-50 p-4 rounded-lg">
+        <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-2">
+            <Thermometer className="h-5 w-5 text-gray-600" />
+            <span className="text-2xl font-semibold text-gray-800">
+              {temperatureData.temperature}°C
+            </span>
+          </div>
+          {temperatureData.humidity && (
+            <span className="text-sm text-gray-600">
+              {temperatureData.humidity}% humidity
+            </span>
+          )}
+          <div className="ml-auto text-sm text-gray-500">
+            Updated: {temperatureData.lastUpdated.toLocaleTimeString()}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -379,6 +455,7 @@ export default function IndoorTemperature({ onTemperatureChange }) {
           {renderDataSourceSelector()}
           {renderGoogleHomeView()}
           {renderManualView()}
+          {renderOcrView()}
         </CardContent>
       </Card>
     </motion.div>
