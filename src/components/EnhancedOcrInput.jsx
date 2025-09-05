@@ -12,7 +12,7 @@ import { Button } from './ui/button';
  * - Specialized filters for seven-segment displays
  * - Real-time image enhancement and noise reduction
  */
-export default function OcrInput({ label, onConfirm }) {
+export default function EnhancedOcrInput({ label, onConfirm }) {
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
   const cropCanvasRef = useRef(null);
@@ -420,7 +420,7 @@ export default function OcrInput({ label, onConfirm }) {
     return () => clearInterval(interval);
   }, [performOCR, videoLoaded]);
 
-  // Handle crop area dragging
+  // Handle crop area dragging (same as original)
   const handleMouseDown = useCallback((e, handle) => {
     e.preventDefault();
     setIsDragging(true);
@@ -459,7 +459,7 @@ export default function OcrInput({ label, onConfirm }) {
     setDragHandle(null);
   }, []);
 
-  // Touch event handlers
+  // Touch event handlers (same as original)
   const handleTouchStart = useCallback((e, handle) => {
     e.preventDefault();
     setIsDragging(true);
@@ -692,4 +692,3 @@ export default function OcrInput({ label, onConfirm }) {
     </div>
   );
 }
-

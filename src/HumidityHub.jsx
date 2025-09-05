@@ -11,7 +11,7 @@ import ComparisonResult from './components/ComparisonResult';
 import LocationPermission from './components/LocationPermission';
 import VentilationForecast from './components/VentilationForecast';
 import TemperatureForecast from './components/TemperatureForecast';
-import TuyaSensor from './components/TuyaSensor';
+import IndoorTemperature from './components/IndoorTemperature';
 
 export default function HumidityHub() {
   const [indoorTemp, setIndoorTemp] = useState(21);
@@ -28,7 +28,7 @@ export default function HumidityHub() {
   const [isForecastLoading, setIsForecastLoading] = useState(false);
   const [forecastError, setForecastError] = useState(null);
 
-  // Handle indoor temperature updates from the TuyaSensor component
+  // Handle indoor temperature updates from the IndoorTemperature component
   const handleIndoorTemperatureChange = useCallback((tempData) => {
     console.log('🏠 Indoor temperature updated:', tempData);
     setIndoorTemp(tempData.temperature);
@@ -271,7 +271,7 @@ export default function HumidityHub() {
 
       {activeTab === 'current' && (
         <>
-        <TuyaSensor onTemperatureChange={handleIndoorTemperatureChange} />
+        <IndoorTemperature onTemperatureChange={handleIndoorTemperatureChange} />
           
           <div className="grid grid-cols-1 gap-6">
             <ClimateDisplayCard title="Indoor Climate" icon={<Home className="h-5 w-5 text-slate-600" />} data={indoorData} isLoading={false} />

@@ -11,7 +11,7 @@
 
 class GoogleAuthConfig {
   constructor() {
-    this.enabled = (import.meta.env.VITE_ENABLE_GOOGLE_OAUTH || process.env.VITE_ENABLE_GOOGLE_OAUTH) === 'true';
+    this.enabled = import.meta.env.VITE_ENABLE_GOOGLE_OAUTH === 'true';
     // OAuth 2.0 Configuration
     this.clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID || import.meta.env.REACT_APP_GOOGLE_CLIENT_ID;
     this.clientSecret = import.meta.env.VITE_GOOGLE_CLIENT_SECRET || import.meta.env.REACT_APP_GOOGLE_CLIENT_SECRET;

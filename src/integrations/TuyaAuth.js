@@ -8,14 +8,13 @@ import crypto from 'crypto';
  */
 class TuyaConfig {
   constructor() {
-    this.accessId = import.meta?.env?.VITE_TUYA_ACCESS_ID || process.env.VITE_TUYA_ACCESS_ID;
-    this.accessSecret = import.meta?.env?.VITE_TUYA_ACCESS_SECRET || process.env.VITE_TUYA_ACCESS_SECRET;
-    this.deviceId = import.meta?.env?.VITE_TUYA_DEVICE_ID || process.env.VITE_TUYA_DEVICE_ID;
+    this.accessId = import.meta?.env?.VITE_TUYA_ACCESS_ID;
+    this.accessSecret = import.meta?.env?.VITE_TUYA_ACCESS_SECRET;
+    this.deviceId = import.meta?.env?.VITE_TUYA_DEVICE_ID;
     this.apiBaseUrl =
       import.meta?.env?.VITE_TUYA_API_BASE_URL ||
-      process.env.VITE_TUYA_API_BASE_URL ||
       'https://openapi.tuyaus.com';
-    this.debug = (import.meta?.env?.VITE_TUYA_DEBUG || process.env.VITE_TUYA_DEBUG) === 'true';
+    this.debug = import.meta?.env?.VITE_TUYA_DEBUG === 'true';
     this.isConfigured = Boolean(this.accessId && this.accessSecret && this.deviceId);
   }
 
