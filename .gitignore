@@ -181,3 +181,27 @@ playwright/.cache/
 # Tesseract OCR data
 *.traineddata
 /tessdata/
+
+# Generated ML samples, model artifacts, APKs and training outputs
+# Prevent committing generated datasets, model files, training results and build artefacts
+/data/
+/data_raw/
+/samples/
+/samples/**
+/machine_learning/samples/
+/machine_learning/output/
+/machine_learning/generated/
+/models/
+/models/**
+/*.keras
+*.h5
+*.pb
+*.onnx
+*.tflite
+*.traineddata
+*_training_results*.json
+*_training_log*.csv
+v3_integration_test_*.json
+apks/
+*.apk
+build-log.txt
