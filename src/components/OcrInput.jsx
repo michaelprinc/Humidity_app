@@ -17,6 +17,7 @@ export default function OcrInput({ label, onConfirm }) {
   const canvasRef = useRef(null);
   const cropCanvasRef = useRef(null);
   const containerRef = useRef(null);
+  const workerRef = useRef(null);
   
   const [preview, setPreview] = useState('');
   const [confidence, setConfidence] = useState(0);
@@ -62,6 +63,28 @@ export default function OcrInput({ label, onConfirm }) {
       if (stream) {
         stream.getTracks().forEach((t) => t.stop());
       }
+    };
+  }, []);
+
+  // Initialize persistent Tesseract worker with custom model
+  useEffect(() => {
+    let worker;
+    const initWorker = async () => {
+      try {
+        worker = await Tesseract.createWorker('enhanced_v3', undefined, {
+          // Path where enhanced_v3.traineddata is served
+          langPath: '/models'
+        });
+        await worker.loadLanguage('enhanced_v3');
+        await worker.initialize('enhanced_v3');
+        workerRef.current = worker;
+      } catch (err) {
+        console.error('Failed to initialize OCR worker', err);
+      }
+    };
+    initWorker();
+    return () => {
+      worker?.terminate();
     };
   }, []);
 
@@ -342,17 +365,24 @@ export default function OcrInput({ label, onConfirm }) {
       ];
       
       const results = [];
-      
+
+      const worker = workerRef.current;
+      if (!worker) {
+        console.warn('OCR worker not ready');
+        return;
+      }
+
       // Test each pipeline with each OCR configuration
       for (const pipeline of pipelines) {
         // Apply pipeline data to canvas
         const pipelineImageData = new ImageData(pipeline.data, canvas.width, canvas.height);
         ctx.putImageData(pipelineImageData, 0, 0);
-        
+
         for (const config of ocrConfigs) {
           try {
-            const result = await Tesseract.recognize(canvas, 'eng', config.options);
-            
+            await worker.setParameters(config.options);
+            const result = await worker.recognize(canvas);
+
             const detectedText = result.data.text.replace(/[^0-9.]/g, '').trim();
             const confidence = result.data.confidence;
             
@@ -412,11 +442,11 @@ export default function OcrInput({ label, onConfirm }) {
     }
   }, [cropArea, videoLoaded, isProcessing]);
 
-  // Auto-OCR every 3 seconds (increased for more processing time)
+  // Auto-OCR every second using preloaded worker for faster feedback
   useEffect(() => {
     if (!videoLoaded) return;
-    
-    const interval = setInterval(performOCR, 3000);
+
+    const interval = setInterval(performOCR, 1000);
     return () => clearInterval(interval);
   }, [performOCR, videoLoaded]);
 
