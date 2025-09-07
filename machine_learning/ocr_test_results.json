@@ -1,0 +1,328 @@
+{
+  "accuracy": 0.0,
+  "total_tested": 10,
+  "correct_predictions": 0,
+  "average_inference_time_ms": 289.12038803100586,
+  "detailed_results": [
+    {
+      "filename": "seven_segment_0_0000.png",
+      "true_digit": 0,
+      "auto_result": {
+        "value": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "suggested_type": "humidity",
+        "valid": true
+      },
+      "humidity_result": {
+        "humidity": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "valid": true
+      },
+      "temperature_result": {
+        "temperature": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "valid": true
+      },
+      "inference_time_ms": 1159.6591472625732,
+      "accuracy": {
+        "auto": false,
+        "humidity": false,
+        "temperature": false
+      }
+    },
+    {
+      "filename": "seven_segment_0_0001.png",
+      "true_digit": 0,
+      "auto_result": {
+        "value": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "suggested_type": "humidity",
+        "valid": true
+      },
+      "humidity_result": {
+        "humidity": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "valid": true
+      },
+      "temperature_result": {
+        "temperature": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "valid": true
+      },
+      "inference_time_ms": 225.65460205078125,
+      "accuracy": {
+        "auto": false,
+        "humidity": false,
+        "temperature": false
+      }
+    },
+    {
+      "filename": "seven_segment_0_0002.png",
+      "true_digit": 0,
+      "auto_result": {
+        "value": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "suggested_type": "humidity",
+        "valid": true
+      },
+      "humidity_result": {
+        "humidity": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "valid": true
+      },
+      "temperature_result": {
+        "temperature": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "valid": true
+      },
+      "inference_time_ms": 186.16557121276855,
+      "accuracy": {
+        "auto": false,
+        "humidity": false,
+        "temperature": false
+      }
+    },
+    {
+      "filename": "seven_segment_0_0003.png",
+      "true_digit": 0,
+      "auto_result": {
+        "value": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "suggested_type": "humidity",
+        "valid": true
+      },
+      "humidity_result": {
+        "humidity": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "valid": true
+      },
+      "temperature_result": {
+        "temperature": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "valid": true
+      },
+      "inference_time_ms": 203.00030708312988,
+      "accuracy": {
+        "auto": false,
+        "humidity": false,
+        "temperature": false
+      }
+    },
+    {
+      "filename": "seven_segment_0_0004.png",
+      "true_digit": 0,
+      "auto_result": {
+        "value": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "suggested_type": "humidity",
+        "valid": true
+      },
+      "humidity_result": {
+        "humidity": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "valid": true
+      },
+      "temperature_result": {
+        "temperature": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "valid": true
+      },
+      "inference_time_ms": 183.09402465820312,
+      "accuracy": {
+        "auto": false,
+        "humidity": false,
+        "temperature": false
+      }
+    },
+    {
+      "filename": "seven_segment_0_0005.png",
+      "true_digit": 0,
+      "auto_result": {
+        "value": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "suggested_type": "humidity",
+        "valid": true
+      },
+      "humidity_result": {
+        "humidity": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "valid": true
+      },
+      "temperature_result": {
+        "temperature": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "valid": true
+      },
+      "inference_time_ms": 184.2825412750244,
+      "accuracy": {
+        "auto": false,
+        "humidity": false,
+        "temperature": false
+      }
+    },
+    {
+      "filename": "seven_segment_0_0006.png",
+      "true_digit": 0,
+      "auto_result": {
+        "value": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "suggested_type": "humidity",
+        "valid": true
+      },
+      "humidity_result": {
+        "humidity": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "valid": true
+      },
+      "temperature_result": {
+        "temperature": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "valid": true
+      },
+      "inference_time_ms": 180.81164360046387,
+      "accuracy": {
+        "auto": false,
+        "humidity": false,
+        "temperature": false
+      }
+    },
+    {
+      "filename": "seven_segment_0_0007.png",
+      "true_digit": 0,
+      "auto_result": {
+        "value": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "suggested_type": "humidity",
+        "valid": true
+      },
+      "humidity_result": {
+        "humidity": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "valid": true
+      },
+      "temperature_result": {
+        "temperature": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "valid": true
+      },
+      "inference_time_ms": 181.7317008972168,
+      "accuracy": {
+        "auto": false,
+        "humidity": false,
+        "temperature": false
+      }
+    },
+    {
+      "filename": "seven_segment_0_0008.png",
+      "true_digit": 0,
+      "auto_result": {
+        "value": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "suggested_type": "humidity",
+        "valid": true
+      },
+      "humidity_result": {
+        "humidity": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "valid": true
+      },
+      "temperature_result": {
+        "temperature": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "valid": true
+      },
+      "inference_time_ms": 193.90177726745605,
+      "accuracy": {
+        "auto": false,
+        "humidity": false,
+        "temperature": false
+      }
+    },
+    {
+      "filename": "seven_segment_0_0009.png",
+      "true_digit": 0,
+      "auto_result": {
+        "value": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "suggested_type": "humidity",
+        "valid": true
+      },
+      "humidity_result": {
+        "humidity": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "valid": true
+      },
+      "temperature_result": {
+        "temperature": 8,
+        "confidence": 0.5,
+        "method": "Template_Matching",
+        "is_confident": false,
+        "valid": true
+      },
+      "inference_time_ms": 192.9025650024414,
+      "accuracy": {
+        "auto": false,
+        "humidity": false,
+        "temperature": false
+      }
+    }
+  ]
+}

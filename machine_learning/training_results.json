@@ -1,0 +1,18 @@
+{
+  "test_accuracy": 0.1,
+  "per_digit_accuracy": [
+    0.0,
+    0.0,
+    1.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0,
+    0.0
+  ],
+  "model_architecture": "Simple CNN for Seven-Segment Digits",
+  "training_epochs": 11,
+  "final_val_accuracy": 0.10000000149011612
+}
