@@ -138,13 +138,20 @@ function applyPreprocessing(canvas, type = 'enhanced') {
 // Run OCR validation tests
 async function runOcrValidation() {
   console.log('🔍 Starting Enhanced OCR Validation Tests...\n');
-  
+
+  // Create and initialize worker once with enhanced model
+  const worker = await Tesseract.createWorker('enhanced_v3', undefined, {
+    langPath: './models'
+  });
+  await worker.loadLanguage('enhanced_v3');
+  await worker.initialize('enhanced_v3');
+
   const testNumbers = ['23.5', '45.2', '67.8', '12.0', '99.9', '8.5'];
   const testStyles = ['seven-segment', 'lcd'];
   const preprocessingTypes = ['enhanced', 'adaptive'];
-  
+
   const results = [];
-  
+
   for (const number of testNumbers) {
     console.log(`Testing number: ${number}`);
     
@@ -162,7 +169,8 @@ async function runOcrValidation() {
         for (const config of testConfigurations) {
           try {
             const startTime = Date.now();
-            const result = await Tesseract.recognize(canvas, 'eng', config.options);
+            await worker.setParameters(config.options);
+            const result = await worker.recognize(canvas);
             const endTime = Date.now();
             
             const detectedText = result.data.text.replace(/[^0-9.]/g, '').trim();
@@ -292,7 +300,9 @@ async function runOcrValidation() {
     console.log('  • Current configuration shows good performance for digital displays');
     console.log('  • Consider using multiple configurations in parallel for best results');
   }
-  
+
+  await worker.terminate();
+
   return {
     overallAccuracy: accuracyRate,
     bestConfiguration: bestConfig[0],
