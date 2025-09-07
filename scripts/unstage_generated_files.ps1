@@ -14,6 +14,7 @@ $patterns = @(
     "machine_learning/output/*",
     "machine_learning/generated/*",
     "machine_learning/samples/*",
+    "machine_learning/seven_segment_dataset/images/*",
     "models/*",
     "data/*",
     "samples/*",
